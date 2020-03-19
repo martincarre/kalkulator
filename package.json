@@ -1,0 +1,30 @@
+{
+  "name": "kalkulator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "example": "examples",
+    "lib": "lib",
+    "test": "test"
+  },
+  "dependencies": {
+    "chai": "^4.2.0"
+  },
+  "devDependencies": {
+    "mocha": "^7.1.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ardzii/kalkulator.git"
+  },
+  "author": "adrzii <ardziig@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ardzii/kalkulator/issues"
+  },
+  "homepage": "https://github.com/Ardzii/kalkulator#readme"
+}
