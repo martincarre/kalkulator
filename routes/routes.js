@@ -1,4 +1,4 @@
-var pmtCalc = require('../kApp/pmtCalc');
+var kApp = require('../kApp/kApp');
 
 var appRouter = function (app) {
 
@@ -6,29 +6,15 @@ var appRouter = function (app) {
     res.status(200).send({ message: 'Welcome to our restful API' });
   });
 
-  app.get("/pmtCalc", function (req, res) {
-    let payload = {
-        i: 0.0025,
-        n: 36,
-        pv: 100,
-        fv: 30,
-        type: 1
-    }
+  app.post("/pmtCalc", function (req, res) {
+    let payload = req.query;  
 
-    var result = pmtCalc(
-        payload.n,
-        payload.i,
-        payload.pv,
-        payload.fv,
-        payload.type,
-        );
+    var result = kApp(payload);
 
-    payload.resutl = result;
+    payload.quote = result;
 
-    res.status(200).json(payload);
-    
+    res.status(200).json(payload);  
   });
-
 }
 
 module.exports = appRouter;
