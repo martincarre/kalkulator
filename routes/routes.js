@@ -3,7 +3,10 @@ var kApp = require('../kApp/kApp');
 var appRouter = function (app) {
 
   app.get("/", function (req, res) {
-    res.status(200).send({ message: 'Welcome to our restful API' });
+    res.status(200).send({ 
+      message: 'Connected to Kalkulator',
+      connected: true
+     });
   });
 
   app.post("/pmtCalc", function (req, res) {
