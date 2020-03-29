@@ -5,6 +5,10 @@ var insCalc = require('./insCalc');
 
 var kApp = function(payload) {
     var result = [];
+
+    for (let e = 0; e < payload.equipment.length; e ++) {
+        // CALCULATE FIQUOTE + INSQUOTE FOR EACH EQUIPMENT 
+    }
     
     for (let n = 24; n < 96; n+=12) {
 
@@ -76,8 +80,6 @@ var kApp = function(payload) {
             payload.marketSel
         );
     }
-
-    console.log(result);
 
     return {
         fiTable: result,
