@@ -10,13 +10,14 @@ var appRouter = function (app) {
   });
 
   app.post("/pmtCalc", function (req, res) {
-    let payload = req.query;  
+    let payload = req.body;  
+    console.log(JSON.stringify(payload));
 
     var result = kApp(payload);
 
     payload.quote = result;
 
-    res.status(200).json(payload);  
+    res.status(201).json(payload);  
   });
 }
 

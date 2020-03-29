@@ -4,46 +4,72 @@ var pmtCalc = require('./pmtCalc');
 var insCalc = require('./insCalc');
 
 var kApp = function(payload) {
-    // CREATE CALL TO RATES DB;
-    var i;
+    var result = [];
+    
+    for (let n = 24; n < 96; n+=12) {
 
-    for(let j = 0; j < RATESMOCK.length; j++) {
-        let currBucket = RATESMOCK[j];
-        let currRange = currBucket.investRange;
-        if (payload.pv*1 >= currRange.min && payload.pv*1<= currRange.max) {
-            for(let y = 0; y < currBucket.rates.length; y++) {
-                let currRate = currBucket.rates[y];
-                let currTenor = currRate.tenor;
-                if (payload.n*1 >= currTenor.min && payload.n*1 <= currTenor.max) {
-                    i = currRate.rate;
+        // SETTING THE TENOR FOR KALK
+        var t;
+        // SETTING THE RATE
+        var i;
+        
+        if(payload.customRate) {
+            i = payload.customRate;
+        } else {
+            // CREATE CALL TO RATES DB;
+            for(let j = 0; j < RATESMOCK.length; j++) {
+                let currBucket = RATESMOCK[j];
+                let currRange = currBucket.investRange;
+                if (payload.pv*1 >= currRange.min && payload.pv*1<= currRange.max) {
+                    for(let y = 0; y < currBucket.rates.length; y++) {
+                        let currRate = currBucket.rates[y];
+                        let currTenor = currRate.tenor;
+                        if (n >= currTenor.min && n <= currTenor.max) {
+                            i = currRate.rate;
+                        }
+                    }
                 }
             }
         }
+
+        // ADAPTING TENOR + RATE TO PERIOD
+        switch (payload.period) {
+            case 'm':
+                i = i / 12;
+                break;
+            case 'q':
+                i = i / 4;
+                t = n / 3;
+                break;
+            case 's': 
+                i = i / 2;
+                t = n / 6;
+                break;
+            case 'a':
+                t = n / 12;
+                break;
+            default: 
+                i = i / 12;
+                break;
+        }
+        
+    // CALCULATING FINANCIAL QUOTE
+        let currFiQuote = pmtCalc(
+            t,
+            i/100,
+            payload.pv*1,
+            payload.fv*1,
+            payload.type*1,
+            payload.commission*1
+        );
+        result.push({
+            n: n,
+            fiQuote: currFiQuote
+        })
     }
-
-
-    switch (payload.period) {
-        case 'm':
-            i = i / 12;
-            payload.n = payload.n*1;
-            break;
-        case 'q':
-            i = i / 4;
-            payload.n = payload.n / 3;
-            break;
-        case 's': 
-            i = i / 2;
-            payload.n = payload.n / 6;
-            break;
-        case 'a':
-            payload.n = payload.n / 12;
-            break;
-        default: 
-            i = i / 12;
-            break;
-    }
-
-    if (payload.insurance === 'true') {
+    
+    // CALCULATING INSURANCE
+    if (payload.insurance) {
         var insPrice = insCalc(
             payload.pv*1,
             payload.period,
@@ -51,17 +77,10 @@ var kApp = function(payload) {
         );
     }
 
-    var result = pmtCalc(
-        payload.n*1,
-        i/100,
-        payload.pv*1,
-        payload.fv*1,
-        payload.type*1,
-        payload.commission*1
-    );
+    console.log(result);
 
     return {
-        fiQuote: result,
+        fiTable: result,
         insQuote: insPrice
     };
 }
