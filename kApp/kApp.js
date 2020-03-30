@@ -7,12 +7,11 @@ var kApp = function(payload) {
     var result = [];
     const totalPrice = payload.leaseParams.totalInvest;
 
-    console.log(payload);
+    console.log('New Operation Recieved:\n', payload);
 
     for (let e = 0; e < payload.equipment.length; e ++) {
         // CALCULATE FIQUOTE + INSQUOTE FOR EACH EQUIPMENT 
         const currEquipmentDetails = payload.equipment[e];
-        console.log(currEquipmentDetails);
         var currPv = currEquipmentDetails.price*1;
         var currFv = currEquipmentDetails.rv*1;
         var currMarket = currEquipmentDetails.market;
