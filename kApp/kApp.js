@@ -53,6 +53,7 @@ var kApp = function(payload) {
             switch (payload.leaseParams.period) {
                 case 'm':
                     i = i / 12;
+                    t = n;
                     break;
                 case 'q':
                     i = i / 4;
@@ -67,6 +68,7 @@ var kApp = function(payload) {
                     break;
                 default: 
                     i = i / 12;
+                    t = n;
                     break;
             }
             
