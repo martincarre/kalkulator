@@ -41,7 +41,7 @@ var insCalc = function(pv, period, marketSel) {
 
     let insuranceFactor = (price.value*1 * (1 + price.taxes*1)) * (1 + insMargin*1) / periodFact*1;
 
-    let result = pv * insuranceFactor + (price.consor*1 / periodFact*1);
+    let result = pv * insuranceFactor + price.consor*1;
 
     return result.toFixed(2);
 }
