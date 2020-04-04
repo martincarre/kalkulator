@@ -1,7 +1,7 @@
 var RATESMOCK = [
     { 
         investRange: {
-        min: 1000,
+        min: 0,
         max: 3999
         },
         rates: [
