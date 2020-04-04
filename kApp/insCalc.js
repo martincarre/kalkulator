@@ -7,6 +7,10 @@ var insCalc = function(pv, period, marketSel) {
     var insMargin;
     var periodFact;
 
+    console.log('pv\t', pv);
+    console.log('period\t', period);
+    console.log('marketSel\t', marketSel);
+
     switch (period) {
         case 'm':
             periodFact = 12;

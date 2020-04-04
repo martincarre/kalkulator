@@ -92,10 +92,10 @@ var kApp = function(payload) {
             }
         }
         // CALCULATING INSURANCE
-        if (payload.leasingDetails.insurance) {
+        if (payload.leasingDetails.insuranceSwitch) {
             var insPrice = insCalc(
                 currPv,
-                payload.leasingDetails.postpaymentSwitch,
+                payload.leasingDetails.period,
                 currMarket
             );
             for (let s = 0; s < result.length; s ++) {
