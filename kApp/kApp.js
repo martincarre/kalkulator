@@ -31,8 +31,8 @@ var kApp = function(payload) {
             var i;
             
             // FOR CUSTOM RATE
-            if(payload.leasingDetails.customRate) {
-                i = payload.leasingDetails.customRate;
+            if(payload.leasingDetails.fundingSwitch) {
+                i = payload.leasingDetails.rate;
             } else {
                 // CREATE CALL TO RATES DB;
                 for(let j = 0; j < RATESMOCK.length; j++) {
@@ -81,6 +81,8 @@ var kApp = function(payload) {
                 currFv,
                 payload.leasingDetails.postpaymentSwitch*1
             );
+
+            // TODO: MAYBE REFACTOR INTO A findIndex() FUNCTION:
             for (let s = 0; s < result.length; s ++) {
                 let currEquip = result[s];
                 if (currEquip.investNumber === e) {
@@ -106,9 +108,15 @@ var kApp = function(payload) {
             }
         }
     }
-    
+
+    // COMMISSION CALC
+    if(payload.leasingDetails.commissionSwich) {
+        var commQuote
+    }
 
     return result;
 }
+
+
 
 module.exports = kApp;
