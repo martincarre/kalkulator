@@ -1,4 +1,5 @@
 var kApp = require('../kApp/kApp');
+var pdfGen = require('../pdfGen/app');
 
 var appRouter = function (app) {
 
@@ -40,6 +41,16 @@ var appRouter = function (app) {
 
     res.status(201).json(result);  
   });
+
+  app.post("/printQuote", function (req, res) {
+    let payload = req.body;
+
+    var result = pdfGen(payload);
+
+    res.status(201).send({
+      message: 'success!'
+    })
+  })
 }
 
 module.exports = appRouter;
