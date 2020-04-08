@@ -5,6 +5,7 @@ const fs = require('fs');
 
 var pdfGenerator = function(payload) {
     console.log('Generating PDF...');
+    console.log('Payload:\n', payload);
 
     // Setting Variables for doc sizing: 
     var A4 = [595.28, 841.89];
@@ -190,8 +191,6 @@ var pdfGenerator = function(payload) {
                 endHeightSecondTable += rowHeight;
                 totalHeightSecondTable += rowHeight;
             }
-
-        console.log(endHeightSecondTable);
         // * Columns
         quantColumn = 60;
         quoteColumn = (secondTableWidth - quantColumn) / 3; // See below why 3
@@ -258,7 +257,6 @@ var pdfGenerator = function(payload) {
         // SECTION8 - Signatures
         var signatureHeight = 125;
         var section8Begin = A4[1] - margins.bottom - signatureHeight;
-        console.log(section8Begin);
         // Signature rects
             doc
                 .lineWidth(0.5)

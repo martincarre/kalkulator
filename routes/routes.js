@@ -1,5 +1,5 @@
-var kApp = require('../kApp/kApp');
-var pdfGen = require('../pdfGen/app');
+var kApp = require('../kApp');
+var pdfGen = require('../pdfGen');
 
 var appRouter = function (app) {
 
@@ -38,6 +38,8 @@ var appRouter = function (app) {
     }
 
     var result = kApp(data);
+
+    // SAVING TO DB:
 
     res.status(201).json(result);  
   });
