@@ -7,6 +7,24 @@ var pdfGenerator = function(payload) {
     console.log('Generating PDF...');
     console.log('Payload:\n', payload);
 
+    // Setting Variables from payload
+    // Customer part
+    var customer = payload.customerDetails;
+    var lessee = {
+        legalName: customer.legalName ? customer.legalName.toUpperCase() : 'NO NAME',
+        vatNumber: customer.vatNumber ? customer.vatNumber.toUpperCase() : 'NO VAT',
+        address: customer.address ? customer.address.toUpperCase() : 'NO ADDRESS'
+    }
+    var lesseeContact = {
+        name: customer.firstName.toUpperCase() + ' ' + customer.lastName.toUpperCase(),
+        role: customer.role ? customer.role.toUpperCase() : 'NO ROLE',
+        email: customer.email ? customer.email.toUpperCase() : 'NO EMAIL',
+        mobile: customer.mPhone ? customer.mPhone.toUpperCase() : 'NO MOBILE',
+        officePhone: customer.phone ? customer.phone.toUpperCase() : 'NO PHONE'
+    }
+    var currDate = new Date();
+    var printingDate = currDate.toLocaleDateString('en-EN');
+
     // Setting Variables for doc sizing: 
     var A4 = [595.28, 841.89];
     var margins = {
@@ -43,6 +61,7 @@ var pdfGenerator = function(payload) {
     var tableHeaderHeight = 25;
     var rowHeight = 15;
     var fillAndLineColor = "#0073bc";
+    var quantColumn = 60; 
     // FIRST TABLE PARAMETERS
     var yBeginFirstTable = 0; // this is set based on section4Begin below
     var endHeightFirstTable = 0; // Set below, should be equal to yBeginFirstTable + tableHeaderHeight;
@@ -73,7 +92,7 @@ var pdfGenerator = function(payload) {
             .font('regular')
             .fontSize(11)
             .text('Offer #XXXXXX-XX', margins.left, margins.top + spaceBetweenText * 2)
-            .text('Date: April, 6th 2020', margins.left, margins.top + spaceBetweenText * 3);
+            .text(`Date: ${printingDate}`, margins.left, margins.top + spaceBetweenText * 3);
 
     
     // SECTION 2 - LESSEE & LESSEE CONTACT
@@ -104,16 +123,16 @@ var pdfGenerator = function(payload) {
         // TODO: add the variables
             .font("regular")
             .fontSize(9)
-            .text('Legal Name:', leftMarginBox1, section2Begin + spaceBetweenText * 2)
-            .text('VAT Number:', leftMarginBox1, section2Begin + spaceBetweenText * 3)
-            .text('Address:', leftMarginBox1, section2Begin + spaceBetweenText * 4)
+            .text(`Legal Name: ${lessee.legalName}`, leftMarginBox1, section2Begin + spaceBetweenText * 2)
+            .text(`VAT Number: ${lessee.vatNumber}`, leftMarginBox1, section2Begin + spaceBetweenText * 3)
+            .text(`Address: ${lessee.address}`, leftMarginBox1, section2Begin + spaceBetweenText * 4)
         // Box2
         // TODO: add the variables
-            .text('Contact Name:', leftMarginBox2, section2Begin + spaceBetweenText * 2)
-            .text('Role:', leftMarginBox2, section2Begin + spaceBetweenText *3)
-            .text('Email:', leftMarginBox2, section2Begin + spaceBetweenText * 4)
-            .text('Mobile:', leftMarginBox2, section2Begin + spaceBetweenText * 5)
-            .text('Office Phone:', leftMarginBox2, section2Begin + spaceBetweenText * 6);
+            .text(`Contact Name: ${lesseeContact.name}`, leftMarginBox2, section2Begin + spaceBetweenText * 2)
+            .text(`Role: ${lesseeContact.role}`, leftMarginBox2, section2Begin + spaceBetweenText *3)
+            .text(`Email: ${lesseeContact.email}`, leftMarginBox2, section2Begin + spaceBetweenText * 4)
+            .text(`Mobile: ${lesseeContact.mobile}`, leftMarginBox2, section2Begin + spaceBetweenText * 5)
+            .text(`Office Phone: ${lesseeContact.officePhone}`, leftMarginBox2, section2Begin + spaceBetweenText * 6);
 
     // SECTION3 - INTRODUCTION SENTENCE
     var section3Begin = section2Begin + section2Height + spaceBetween;
@@ -134,23 +153,36 @@ var pdfGenerator = function(payload) {
         totalHeightFirstTable += tableHeaderHeight;
         endHeightFirstTable = yBeginFirstTable + tableHeaderHeight;
         // * Lines
-        // TODO: Replace 45 with equips.length * rowHeight
-        var totalLines = 45;
+        var totalLines = payload.equipments.length * rowHeight;
             for (let i = 0; i <  totalLines; i+=rowHeight) {
                     doc
-                        .rect(35, endHeightFirstTable, fullWidth, rowHeight)
+                        .fillAndStroke('#0073bc')
+                        .rect(margins.left, endHeightFirstTable, fullWidth, rowHeight)
                         .lineWidth(0.5)
                         .fillOpacity(0)
                     doc.stroke();
+
+                    // TODO: Add the equipment quantity
+                    doc
+                        .font('light')
+                        .fontSize(8)
+                        .fillAndStroke('#000000')
+                        .fillOpacity(1)
+                        .text(
+                            payload.equipments[i / rowHeight].make 
+                            + ' - ' 
+                            + payload.equipments[i / rowHeight].model 
+                            + ' - '
+                            + payload.equipments[i / rowHeight].description,
+                            margins.left + quantColumn + 5, endHeightFirstTable + 2.5
+                        );
                     endHeightFirstTable += rowHeight;
                     totalHeightFirstTable += rowHeight;
-
-                    // TODO: Add the equipment quantity and description
                 }
             endHeightFirstTable = yBeginFirstTable + totalHeightFirstTable - tableHeaderHeight + spaceBetween;
         // * Columns
-        var quantColumn = 60; 
         doc
+            .fillAndStroke("#0073bc")
             .moveTo(margins.left + quantColumn, yBeginFirstTable)
             .lineTo(margins.left + quantColumn, endHeightFirstTable)
             .stroke();
@@ -227,14 +259,32 @@ var pdfGenerator = function(payload) {
         doc
             .image('./pdfGen/images/iconmonstr-info-6-240.png', margins.left * 2 / 3, contractDetailsBegin + 10, { width: 35 });
         // * Details
+        var leasingDetails = payload.leasingDetails;
+        switch(leasingDetails.period) {
+            case 'm': 
+                var period = 'Monthly'
+                break;
+            case 'q': 
+                var period = 'Quarterly'
+                break;
+            case 's': 
+                var period = 'Semi-annualy'
+                break;
+            case 'a': 
+                var period = 'Annualy'
+                break;
+            default: 
+                var period = 'Monthly'
+                break;
+        }
         doc
             .font('regular')
             .fontSize(9)
             .fillAndStroke('#000000')
-            .text('Leasing Type: ', margins.left + iIconWidth, contractDetailsBegin)
-            .text('Periodicity: ', margins.left + iIconWidth, contractDetailsBegin + spaceBetweenText)
-            .text('Total Tenor: ', margins.left + iIconWidth, contractDetailsBegin + spaceBetweenText * 2)
-            .text('Quote Type: ', margins.left + iIconWidth, contractDetailsBegin + spaceBetweenText * 3);
+            .text(`Leasing Type: Operational Lease`, margins.left + iIconWidth, contractDetailsBegin)
+            .text(`Periodicity: ${period}`, margins.left + iIconWidth, contractDetailsBegin + spaceBetweenText)
+            .text(`Total Tenor: ${leasingDetails.tenor}`, margins.left + iIconWidth, contractDetailsBegin + spaceBetweenText * 2)
+            .text(`Quote Type: ${leasingDetails.postpaymentSwitch ? 'End of period' : 'Prepayment'}`, margins.left + iIconWidth, contractDetailsBegin + spaceBetweenText * 3);
 
 
         // SECTION6 - RGPD
@@ -272,7 +322,7 @@ var pdfGenerator = function(payload) {
                 .font('regular')
                 .fontSize(6.5)
                 .fillOpacity(1)
-                .text('On the behalf of *COMAPANY NAME*, I aknowledge and agree to the above,', margins.left + 5, section8Begin + 5)
+                .text(`On the behalf of ${lessee.legalName}, I aknowledge and agree to the above,`, margins.left + 5, section8Begin + 5)
                 .fontSize(8)
                 .text('Name (Print):', margins.left + 5, A4[1] - margins.bottom - ( 3 * 8 + 3 * spaceBetweenText))
                 .text('Title:', margins.left + 5, A4[1] - margins.bottom - ( 3 * 8 + 2 * spaceBetweenText))
